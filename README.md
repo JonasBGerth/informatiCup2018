@@ -1,0 +1,1 @@
+# informatiCup2018
