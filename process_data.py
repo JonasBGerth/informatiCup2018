@@ -10,7 +10,9 @@ from fbprophet import Prophet
 class InformatiCup2018(object):
     def __init__(self, data_dir):
         self.data_dir = data_dir
-        self.gas_stations_dir = data_dir + os.path.join('Eingabedaten', 'Benzinpreise')
+        self.gas_stations_data_dir = data_dir + os.path.join('Eingabedaten', 'Benzinpreise')
+        self.gas_stations_dir = data_dir + os.path.join('Eingabedaten', 'Tankstellen.csv')
+        self.gas_stations = {}
         self.gas_stations_dfs = {}
         self.gas_stations_models = {}
 
@@ -18,9 +20,14 @@ class InformatiCup2018(object):
         self.read_all_gas_stations()
         self.create_models_for_all_gas_stations()
 
+    def init_gas_stations(self):
+        self.gas_stations = pd.read_csv(self.gas_stations_dir, sep=';', header=None,
+                                        names=['id', 'name', 'brand', 'street', 'house_no', 'plz', 'town', 'latutude',
+                                               'longitude'])
+
     def read_gas_station_data(self, gas_station_id: int):
         print(f"Reading data for gas station {gas_station_id}.")
-        data = pd.read_csv(os.path.join(self.gas_stations_dir, f'{gas_station_id}.csv'),
+        data = pd.read_csv(os.path.join(self.gas_stations_data_dir, f'{gas_station_id}.csv'),
                            sep=';', header=None,
                            names=['ds', 'y'])
 
@@ -30,7 +37,7 @@ class InformatiCup2018(object):
         return data
 
     def read_all_gas_stations(self):
-        for file in os.listdir(self.gas_stations_dir):
+        for file in os.listdir(self.gas_stations_data_dir):
             m = re.search(r'(.*)[.]', file)
             id = int(m.group(1))
             self.gas_stations_dfs[id] = self.read_gas_station_data(id)
@@ -45,7 +52,7 @@ class InformatiCup2018(object):
         return m
 
     def create_models_for_all_gas_stations(self):
-        for file in os.listdir(self.gas_stations_dir):
+        for file in os.listdir(self.gas_stations_data_dir):
             m = re.search(r'(.*)[.]', file)
             id = int(m.group(1))
             self.gas_stations_models[id] = self.create_model_for_gas_station(id)
@@ -65,4 +72,6 @@ if __name__ == '__main__':
     # print(predict_dates)
     # ic.create_model_for_gas_station(1)
     # print(ic.predict_prices(1, predict_dates))
-    ic.init_all()
+    # ic.init_all()
+    ic.init_gas_stations()
+    print(ic.gas_stations)
