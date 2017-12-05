@@ -5,6 +5,8 @@ import pandas as pd
 import os
 import re
 from fbprophet import Prophet
+import matplotlib.pyplot as plt
+import numpy as np
 
 
 class InformatiCup2018(object):
@@ -63,15 +65,21 @@ class InformatiCup2018(object):
         forecast = self.gas_stations_models[gas_station_id].predict(predict_date)
         return forecast[['ds', 'yhat']]
 
+    # def create_
+
+
+
 
 if __name__ == '__main__':
     ic = InformatiCup2018(data_dir="/Users/ole/InformatiCup2018/")
-    # data = ic.read_gas_station_data(1)
+    data = ic.read_gas_station_data(1)
+
     # predict_dates = list(map(str, data['ds'].tolist()[-5:]))
+    # predict_dates = pd.date_range('9/21/2016', periods=365*24, freq='H')
     # print(data.tail())
     # print(predict_dates)
     # ic.create_model_for_gas_station(1)
     # print(ic.predict_prices(1, predict_dates))
     # ic.init_all()
-    ic.init_gas_stations()
-    print(ic.gas_stations)
+    # ic.init_gas_stations()
+    # print(ic.gas_stations)
