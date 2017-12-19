@@ -71,9 +71,9 @@ class InformatiCup2018(object):
         gas_station_ids = []
         with open(file_name, 'r') as f:
             for line in f:
-                line = line.replace('\n','')
+                line = line.replace('\n', '')
                 try:
-                    starting_fuel = float(line)
+                    starting_fuel = float(line.replace(';', ''))
                 except ValueError:
                     dates.append(line.split(';')[0])
                     gas_station_ids.append(line.split(';')[1])
@@ -83,13 +83,26 @@ class InformatiCup2018(object):
         print(gas_station_ids)
 
         predicted_prices = []
-        for i,gas_station in enumerate(gas_station_ids):
+        for i, gas_station in enumerate(gas_station_ids):
             self.read_gas_station_data(gas_station)
             self.create_model_for_gas_station(gas_station)
             predicted_prices.append(self.predict_prices(gas_station, [dates[i]]))
             print(predicted_prices)
 
         print(predicted_prices)
+        self.write_predicted_prices_to_csv('/Users/ole/Berta3.csv',predicted_prices,gas_station_ids,starting_fuel)
+
+    def write_predicted_prices_to_csv(self, file, predicted_prices, gas_stations, starting_fuel):
+        with open(file, 'w') as f:
+            f.write(str(starting_fuel) + ';\n')
+
+            for i, gs in enumerate(gas_stations):
+                line = ''
+                line += str(predicted_prices[i]['ds'].get(0)) + ';'
+                line += str(gs) + ';'
+                line += "{:.0f}".format(predicted_prices[i]['yhat'].get(0)) + ';\n'
+
+                f.write(line)
 
 
 if __name__ == '__main__':
@@ -97,6 +110,7 @@ if __name__ == '__main__':
     # data = ic.read_gas_station_data(1)
 
     ic.predict_route_prices('/Users/ole/InformatiCup2018/Eingabedaten/Fahrzeugrouten/Bertha Benz Memorial Route.csv')
+    # ic.predict_route_prices('/Users/ole/Berta2.csv')
     # predict_dates = list(map(str, data['ds'].tolist()[-5:]))
     # predict_dates = pd.date_range('9/21/2016', periods=365*24, freq='H')
     # print(data.tail())
