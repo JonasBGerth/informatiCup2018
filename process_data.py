@@ -94,7 +94,6 @@ class InformatiCup2018(object):
 
     def write_predicted_prices_to_csv(self, file, predicted_prices, gas_stations, starting_fuel):
         with open(file, 'w') as f:
-            f.write(str(starting_fuel) + ';\n')
 
             for i, gs in enumerate(gas_stations):
                 line = ''
