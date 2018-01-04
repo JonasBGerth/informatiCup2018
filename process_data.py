@@ -7,7 +7,12 @@ import re
 from fbprophet import Prophet
 import matplotlib.pyplot as plt
 import numpy as np
+import math
 
+
+def dist(a, b):
+    return 6378.388 * math.acos((math.sin(math.radians(a[1])) * math.sin(math.radians(b[1]))) + math.cos(math.radians(a[1])) * math.cos(
+        math.radians(b[1])) * math.cos(math.radians(b[0]) - math.radians(a[0])))
 
 class InformatiCup2018(object):
     def __init__(self, data_dir):
@@ -23,9 +28,9 @@ class InformatiCup2018(object):
         self.create_models_for_all_gas_stations()
 
     def init_gas_stations(self):
-        self.gas_stations = pd.read_csv(self.gas_stations_dir, sep=';', header=None,
-                                        names=['id', 'name', 'brand', 'street', 'house_no', 'plz', 'town', 'latutude',
-                                               'longitude'])
+        self.gas_stations = pd.read_csv(self.gas_stations_dir, sep=';', header=None, index_col = 'id',
+                                        names=['id', 'name', 'brand', 'street', 'house_no', 'plz', 'town', 'Long',
+                                               'Lat'])
 
     def read_gas_station_data(self, gas_station_id: int):
         print(f"Reading data for gas station {gas_station_id}.")
@@ -78,9 +83,20 @@ class InformatiCup2018(object):
                     dates.append(line.split(';')[0])
                     gas_station_ids.append(line.split(';')[1])
 
+        # Time is the date of arrival at the gas station
+        # Hash tag is the id of the gas station
+        route = pd.read_csv(file_name, delimiter=';', skiprows=1, names=["Time", "#"])
+        capacity = starting_fuel
+        self.init_gas_stations()
+        tanks = self.gas_stations[['Long','Lat']]
+
+        G = pd.DataFrame(columns=['V', 'E'])
+
         print(starting_fuel)
         print(dates)
         print(gas_station_ids)
+
+
 
         predicted_prices = []
         for i, gas_station in enumerate(gas_station_ids):
