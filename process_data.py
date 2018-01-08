@@ -81,7 +81,7 @@ class InformatiCup2018(object):
 
         return files
 
-    def calculate_tank_stops(self, file_name):
+    def calculate_tank_stops(self, file_name, output_file_name):
         starting_fuel = 0.0
         dates = []
         gas_station_ids = []
@@ -179,23 +179,7 @@ class InformatiCup2018(object):
         route_result = route.copy()
         route_result['Price'] = G['V']
         route_result['Fuel'] = G['F']
-        route_result.to_csv('/Users/ole/Berta30.csv', sep=';', header=None, index=None, decimal=',')
-
-        # TODO: Add code from Algorithm notebook to finish processing
-
-        # print(starting_fuel)
-        # print(dates)
-        # print(gas_station_ids)
-        #
-        # predicted_prices = []
-        # for i, gas_station in enumerate(gas_station_ids):
-        #     self.read_gas_station_data(gas_station)
-        #     self.create_model_for_gas_station(gas_station)
-        #     predicted_prices.append(self.predict_prices(gas_station, [dates[i]]))
-        #     print(predicted_prices)
-        #
-        # print(predicted_prices)
-        # self.write_predicted_prices_to_csv('/Users/ole/Berta3.csv', predicted_prices, gas_station_ids, starting_fuel)
+        route_result.to_csv(output_file_name, sep=';', header=None, index=None, decimal=',')
 
     def write_predicted_prices_to_csv(self, file, predicted_prices, gas_stations, starting_fuel):
         with open(file, 'w') as f:
@@ -211,8 +195,9 @@ class InformatiCup2018(object):
 if __name__ == '__main__':
     ic = InformatiCup2018(data_dir="/Users/ole/InformatiCup2018/")
     # data = ic.read_gas_station_data(1)
-    for f in ic.get_all_route_files():
-        ic.calculate_tank_stops(f)
+    # for f in ic.get_all_route_files():
+    ic.calculate_tank_stops('/Users/ole/InformatiCup2018/Eingabedaten/Fahrzeugrouten/Bertha Benz Memorial Route.csv',
+                            '/Users/ole/InformatiCup2018/Ausgabedaten/Tankstrategien/Berta1.csv')
     # ic.predict_route_prices('/Users/ole/InformatiCup2018/Eingabedaten/Fahrzeugrouten/Bertha Benz Memorial Route.csv')
     # ic.predict_route_prices('/Users/ole/Berta2.csv')
     # predict_dates = list(map(str, data['ds'].tolist()[-5:]))
