@@ -5,8 +5,6 @@ import pandas as pd
 import os
 import re
 from fbprophet import Prophet
-import matplotlib.pyplot as plt
-import numpy as np
 import math
 
 
@@ -77,17 +75,25 @@ class InformatiCup2018(object):
         """Return a list of all route files inside the `Eingabedaten/Fahrzeugrouten` folder. """
         files = []
         for file in os.listdir(self.routes):
-            files.append(os.path.join(self.routes,file))
+            files.append(os.path.join(self.routes, file))
 
         return files
 
-    def calculate_tank_stops(self, file_name, output_file_name):
+    def calculate_tank_stops(self, input_file, output_file_name=None):
+        """Calculate tank stops and create an output file.
+
+        :param input_file: Full path to a route source file (e.g. Bertha Benz Memorial Route.csv)   
+        :param output_file_name: Full path to an output file. (Optional). If left blank, will create a new file in the folder of the input file. 
+
+        :return: Nothing
+
+        """
         starting_fuel = 0.0
         dates = []
         gas_station_ids = []
 
         # Read initial gas load
-        with open(file_name, 'r') as f:
+        with open(input_file, 'r') as f:
             for line in f:
                 line = line.replace('\n', '')
                 try:
@@ -99,7 +105,7 @@ class InformatiCup2018(object):
         # Read route information
         # Time is the date of arrival at the gas station
         # Hash tag is the id of the gas station
-        route = pd.read_csv(file_name, delimiter=';', skiprows=1, names=["Time", "#"])
+        route = pd.read_csv(input_file, delimiter=';', skiprows=1, names=["Time", "#"])
         self.init_gas_stations()
 
         # predict prices for given datetimes and gas stations. This will take a while!
@@ -107,7 +113,7 @@ class InformatiCup2018(object):
         for index, row in route.iterrows():
             self.read_gas_station_data(row['#'])
             self.create_model_for_gas_station(row['#'])
-            a = self.predict_prices(row['#'],[row['Time']])
+            a = self.predict_prices(row['#'], [row['Time']])
             r.append(a[['yhat']].loc[0][0])
             print(row['Time'], row['#'])
 
@@ -179,33 +185,8 @@ class InformatiCup2018(object):
         route_result = route.copy()
         route_result['Price'] = G['V']
         route_result['Fuel'] = G['F']
+
+        if output_file_name is None:
+            output_file_name = os.path.join(os.path.split(input_file)[0], os.path.split(input_file.split('.')[0])[1] + "_output.csv")
+
         route_result.to_csv(output_file_name, sep=';', header=None, index=None, decimal=',')
-
-    def write_predicted_prices_to_csv(self, file, predicted_prices, gas_stations, starting_fuel):
-        with open(file, 'w') as f:
-            for i, gs in enumerate(gas_stations):
-                line = ''
-                line += str(predicted_prices[i]['ds'].get(0)) + ';'
-                line += str(gs) + ';'
-                line += "{:.0f}".format(predicted_prices[i]['yhat'].get(0)) + ';\n'
-
-                f.write(line)
-
-
-if __name__ == '__main__':
-    ic = InformatiCup2018(data_dir="/Users/ole/InformatiCup2018/")
-    # data = ic.read_gas_station_data(1)
-    # for f in ic.get_all_route_files():
-    ic.calculate_tank_stops('/Users/ole/InformatiCup2018/Eingabedaten/Fahrzeugrouten/Bertha Benz Memorial Route.csv',
-                            '/Users/ole/InformatiCup2018/Ausgabedaten/Tankstrategien/Berta1.csv')
-    # ic.predict_route_prices('/Users/ole/InformatiCup2018/Eingabedaten/Fahrzeugrouten/Bertha Benz Memorial Route.csv')
-    # ic.predict_route_prices('/Users/ole/Berta2.csv')
-    # predict_dates = list(map(str, data['ds'].tolist()[-5:]))
-    # predict_dates = pd.date_range('9/21/2016', periods=365*24, freq='H')
-    # print(data.tail())
-    # print(predict_dates)
-    # ic.create_model_for_gas_station(1)
-    # print(ic.predict_prices(1, predict_dates))
-    # ic.init_all()
-    # ic.init_gas_stations()
-    # print(ic.gas_stations)
