@@ -1,8 +1,5 @@
-import main
-import numpy as np
-import matplotlib.pyplot as plt
+from samples import main
 import pyflux as pf
-import pandas as pd
 
 fuelPrice = main.fuelPrice['2016-12']
 H = 50

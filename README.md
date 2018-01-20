@@ -1,4 +1,4 @@
 # informatiCup2018
 
-Link to Google Doc: 
-https://docs.google.com/document/d/1DHsKUcmufVI443Q3isuSMs54NJClGuVXIQMMSIlAhGw/edit?usp=sharing
+This is the solution for informatiCup 2018 from the team from Fachhochschule Kiel.
+
